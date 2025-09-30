@@ -1,8 +1,10 @@
 name: CI Joomla
 
-on:
-  push:
-  pull_request:
+on: pull_request
+
+# on:
+#   push:
+#   pull_request:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -21,7 +23,7 @@ jobs:
           path: libraries/vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
       - name: Install PHP dependencies
-        if: steps.cache-php.outputs.cache-hit != 'true'
+        # if: steps.cache-php.outputs.cache-hit != 'true'
         run: |
           git config --global --add safe.directory $GITHUB_WORKSPACE
           composer config --global home
@@ -50,7 +52,7 @@ jobs:
           path: libraries/vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
       - name: Build assets
-        if: steps.cache-assets.outputs.cache-hit != 'true'
+        # if: steps.cache-assets.outputs.cache-hit != 'true'
         run: npm ci --unsafe-perm
 
   code-style-php:
@@ -189,7 +191,7 @@ jobs:
           extensions: openssl, mbstring, fileinfo, gd, gmp, pgsql, mysql, mysqli, curl, opcache, ldap
           ini-values: post_max_size=256M, date.timezone="UTC"
       - name: Install Composer dependencies
-        if: steps.cache-php-windows.outputs.cache-hit != 'true'
+        # if: steps.cache-php-windows.outputs.cache-hit != 'true'
         run: composer install --no-progress --ignore-platform-reqs
       - name: Run Unit tests
         run: php libraries/vendor/bin/phpunit --testsuite Unit
@@ -220,7 +222,7 @@ jobs:
           extensions: openssl, mbstring, fileinfo, gd, gmp, pgsql, mysql, mysqli, curl, opcache, ldap
           ini-values: post_max_size=256M, date.timezone="UTC"
       - name: Install Composer dependencies
-        if: steps.cache-php-windows.outputs.cache-hit != 'true'
+        # if: steps.cache-php-windows.outputs.cache-hit != 'true'
         run: |
           composer install --no-progress --ignore-platform-reqs
           mysql -uroot -pjoomla_ut -e 'CREATE DATABASE IF NOT EXISTS test_joomla;'
@@ -252,7 +254,7 @@ jobs:
             /github/home/.cache/Cypress
           key: ${{ runner.os }}-cypress-${{ hashFiles('package-lock.json') }}
       - name: Install Cypress dependencies
-        if: steps.cache-cypress.outputs.cache-hit != 'true'
+        # if: steps.cache-cypress.outputs.cache-hit != 'true'
         run: |
           npx cypress install
           npx cypress verify
@@ -306,7 +308,7 @@ jobs:
         run: bash tests/System/entrypoint.sh "$(pwd)" ${{ matrix.config.test_group }} ${{ matrix.config.db_engine }} ${{ matrix.config.db_host }} ${{ matrix.browser }}
       - name: Archive test results results
         uses: actions/upload-artifact@v4
-        if: always()
+        # if: always()
         with:
           name: system-test-output
           path: tests/System/output
